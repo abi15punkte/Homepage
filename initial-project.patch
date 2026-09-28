@@ -1,0 +1,831 @@
+diff --git a/package.json b/package.json
+new file mode 100644
+index 0000000..5f5a8e1
+--- /dev/null
++++ b/package.json
+@@ -0,0 +1,15 @@
++{
++  "name": "einmaleins",
++  "private": true,
++  "version": "0.1.0",
++  "type": "module",
++  "scripts": {
++    "dev": "vite",
++    "build": "tsc --noEmit && vite build",
++    "test": "vitest run",
++    "test:watch": "vitest",
++    "preview": "vite preview"
++  },
++  "devDependencies": {
++    "typescript": "^5.9.2",
++    "vite": "^7.1.3",
++    "vitest": "^3.2.4"
++  }
++}
+diff --git a/tsconfig.json b/tsconfig.json
+new file mode 100644
+index 0000000..c5bd2aa
+--- /dev/null
++++ b/tsconfig.json
+@@ -0,0 +1,14 @@
++{
++  "compilerOptions": {
++    "target": "ES2022",
++    "useDefineForClassFields": true,
++    "module": "ESNext",
++    "moduleResolution": "Bundler",
++    "strict": true,
++    "noUnusedLocals": true,
++    "noUnusedParameters": true,
++    "noFallthroughCasesInSwitch": true,
++    "noEmit": true,
++    "skipLibCheck": true
++  },
++  "include": ["src", "tests", "vite.config.ts"]
++}
+diff --git a/vite.config.ts b/vite.config.ts
+new file mode 100644
+index 0000000..1189ef3
+--- /dev/null
++++ b/vite.config.ts
+@@ -0,0 +1,7 @@
++import { defineConfig } from "vite";
++
++export default defineConfig({
++  server: {
++    host: true
++  }
++});
+diff --git a/index.html b/index.html
+new file mode 100644
+index 0000000..fbca7f5
+--- /dev/null
++++ b/index.html
+@@ -0,0 +1,20 @@
++<!doctype html>
++<html lang="de">
++  <head>
++    <meta charset="UTF-8" />
++    <meta
++      name="viewport"
++      content="width=device-width, initial-scale=1, viewport-fit=cover"
++    />
++    <meta name="theme-color" content="#0f172a" />
++    <meta name="apple-mobile-web-app-capable" content="yes" />
++    <meta
++      name="apple-mobile-web-app-status-bar-style"
++      content="black-translucent"
++    />
++    <meta name="apple-mobile-web-app-title" content="Einmaleins" />
++    <title>Einmaleins</title>
++  </head>
++  <body>
++    <div id="app"></div>
++    <script type="module" src="/src/main.ts"></script>
++  </body>
++</html>
+diff --git a/src/main.ts b/src/main.ts
+new file mode 100644
+index 0000000..74e84d1
+--- /dev/null
++++ b/src/main.ts
+@@ -0,0 +1,11 @@
++const app = document.querySelector<HTMLDivElement>("#app");
++
++if (!app) {
++  throw new Error("App root element not found");
++}
++
++app.innerHTML = `
++  <main>
++    <h1>Einmaleins</h1>
++    <p>Die Spielgrundlage wird aufgebaut.</p>
++  </main>
++`;
+diff --git a/src/domain/tasks.ts b/src/domain/tasks.ts
+new file mode 100644
+index 0000000..d0dbd20
+--- /dev/null
++++ b/src/domain/tasks.ts
+@@ -0,0 +1,154 @@
++export interface Task {
++  readonly a: number;
++  readonly b: number;
++}
++
++const task = (a: number, b: number): Task =>
++  Object.freeze({ a, b });
++
++/**
++ * Die sechs verbindlichen Aufgabenpools aus der Projektspezifikation.
++ *
++ * Diese Definition darf nicht durch Zufallslogik verändert werden.
++ */
++export const TASK_POOLS = Object.freeze([
++  Object.freeze([
++    task(2, 2),
++    task(3, 2),
++    task(4, 2),
++    task(5, 2),
++    task(3, 3),
++    task(4, 4)
++  ]),
++  Object.freeze([
++    task(6, 2),
++    task(4, 3),
++    task(5, 5),
++    task(6, 5),
++    task(7, 2),
++    task(5, 3)
++  ]),
++  Object.freeze([
++    task(8, 2),
++    task(9, 2),
++    task(6, 3),
++    task(5, 4),
++    task(6, 4),
++    task(7, 3)
++  ]),
++  Object.freeze([
++    task(8, 3),
++    task(9, 3),
++    task(7, 4),
++    task(8, 4),
++    task(9, 4),
++    task(6, 6)
++  ]),
++  Object.freeze([
++    task(7, 5),
++    task(8, 5),
++    task(9, 5),
++    task(7, 7),
++    task(8, 8),
++    task(9, 9)
++  ]),
++  Object.freeze([
++    task(7, 6),
++    task(8, 6),
++    task(9, 6),
++    task(8, 7),
++    task(9, 8),
++    task(9, 7)
++  ])
++] as const);
++
++/**
++ * Die 64 Aufgaben des dritten Durchlaufs.
++ *
++ * Die Liste ist verbindlich und wird vollständig zufällig angeordnet.
++ * Jede Aufgabe darf in diesem Durchlauf genau einmal vorkommen.
++ */
++export const ROUND_THREE_TASKS = Object.freeze([
++  task(2, 2),
++  task(3, 2),
++  task(2, 3),
++  task(4, 2),
++  task(2, 4),
++  task(5, 2),
++  task(2, 5),
++  task(6, 2),
++  task(2, 6),
++  task(7, 2),
++  task(2, 7),
++  task(8, 2),
++  task(2, 8),
++  task(9, 2),
++  task(2, 9),
++  task(3, 3),
++  task(4, 3),
++  task(3, 4),
++  task(5, 3),
++  task(3, 5),
++  task(6, 3),
++  task(3, 6),
++  task(7, 3),
++  task(3, 7),
++  task(8, 3),
++  task(3, 8),
++  task(9, 3),
++  task(3, 9),
++  task(4, 4),
++  task(5, 4),
++  task(4, 5),
++  task(6, 4),
++  task(4, 6),
++  task(7, 4),
++  task(4, 7),
++  task(8, 4),
++  task(4, 8),
++  task(9, 4),
++  task(4, 9),
++  task(5, 5),
++  task(6, 5),
++  task(5, 6),
++  task(7, 5),
++  task(5, 7),
++  task(8, 5),
++  task(5, 8),
++  task(9, 5),
++  task(5, 9),
++  task(6, 6),
++  task(7, 6),
++  task(6, 7),
++  task(8, 6),
++  task(6, 8),
++  task(9, 6),
++  task(6, 9),
++  task(7, 7),
++  task(8, 7),
++  task(7, 8),
++  task(9, 7),
++  task(7, 9),
++  task(8, 8),
++  task(9, 8),
++  task(8, 9),
++  task(9, 9)
++] as const);
++
++export function reverseFactors(value: Task): Task {
++  return task(value.b, value.a);
++}
++
++export function taskKey(value: Task): string {
++  return `${value.a}x${value.b}`;
++}
++
++export function taskResult(value: Task): number {
++  return value.a * value.b;
++}
+diff --git a/src/domain/rounds.ts b/src/domain/rounds.ts
+new file mode 100644
+index 0000000..27d6514
+--- /dev/null
++++ b/src/domain/rounds.ts
+@@ -0,0 +1,51 @@
++import {
++  ROUND_THREE_TASKS,
++  TASK_POOLS,
++  type Task,
++  reverseFactors
++} from "./tasks";
++
++export type RandomSource = () => number;
++
++export const systemRandom: RandomSource = Math.random;
++
++export function shuffled<T>(
++  values: readonly T[],
++  random: RandomSource = systemRandom
++): T[] {
++  const result = [...values];
++
++  for (let i = result.length - 1; i > 0; i -= 1) {
++    const j = Math.floor(random() * (i + 1));
++    [result[i], result[j]] = [result[j], result[i]];
++  }
++
++  return result;
++}
++
++export function createRoundOne(
++  random: RandomSource = systemRandom
++): Task[][] {
++  return TASK_POOLS.map((pool) => shuffled(pool, random));
++}
++
++export function createRoundTwo(
++  random: RandomSource = systemRandom
++): Task[][] {
++  return TASK_POOLS.map((pool) =>
++    shuffled(pool.map(reverseFactors), random)
++  );
++}
++
++export function createRoundThree(
++  random: RandomSource = systemRandom
++): Task[] {
++  return shuffled(ROUND_THREE_TASKS, random);
++}
++
++export function flattenPools(
++  pools: readonly (readonly Task[])[]
++): Task[] {
++  return pools.flatMap((pool) => [...pool]);
++}
++
++export function createAllRounds(
++  random: RandomSource = systemRandom
++): {
++  readonly roundOne: Task[][];
++  readonly roundTwo: Task[][];
++  readonly roundThree: Task[];
++} {
++  return {
++    roundOne: createRoundOne(random),
++    roundTwo: createRoundTwo(random),
++    roundThree: createRoundThree(random)
++  };
++}
+diff --git a/src/domain/scoring.ts b/src/domain/scoring.ts
+new file mode 100644
+index 0000000..4f4a7c4
+--- /dev/null
++++ b/src/domain/scoring.ts
+@@ -0,0 +1,27 @@
++export const BASE_SCORE = 100;
++
++export function basePoints(elapsedSeconds: number): number {
++  if (!Number.isFinite(elapsedSeconds) || elapsedSeconds < 0) {
++    throw new RangeError(
++      "elapsedSeconds must be a finite non-negative number"
++    );
++  }
++
++  return BASE_SCORE * Math.pow(0.5, elapsedSeconds / 2);
++}
++
++/**
++ * Der Multiplikator wird vor dem finalen Runden angewendet.
++ * Dadurch ist die Rundung für identische Eingaben deterministisch.
++ */
++export function awardedPoints(
++  elapsedSeconds: number,
++  multiplier: number
++): number {
++  if (!Number.isFinite(multiplier) || multiplier < 1) {
++    throw new RangeError(
++      "multiplier must be a finite number >= 1"
++    );
++  }
++
++  return Math.round(basePoints(elapsedSeconds) * multiplier);
++}
+diff --git a/src/domain/multiplier.ts b/src/domain/multiplier.ts
+new file mode 100644
+index 0000000..8c20fd8
+--- /dev/null
++++ b/src/domain/multiplier.ts
+@@ -0,0 +1,23 @@
++export function multiplierForStreak(streak: number): number {
++  if (!Number.isInteger(streak) || streak < 0) {
++    throw new RangeError(
++      "streak must be a non-negative integer"
++    );
++  }
++
++  if (streak >= 20) {
++    return 5;
++  }
++
++  if (streak >= 10) {
++    return 3;
++  }
++
++  if (streak >= 3) {
++    return 2;
++  }
++
++  return 1;
++}
+diff --git a/tests/tasks.test.ts b/tests/tasks.test.ts
+new file mode 100644
+index 0000000..96a0d8a
+--- /dev/null
++++ b/tests/tasks.test.ts
+@@ -0,0 +1,145 @@
++import { describe, expect, it } from "vitest";
++import {
++  ROUND_THREE_TASKS,
++  TASK_POOLS,
++  taskKey
++} from "../src/domain/tasks";
++import {
++  createRoundOne,
++  createRoundTwo,
++  createRoundThree,
++  flattenPools
++} from "../src/domain/rounds";
++
++const poolKeys = (
++  pool: readonly { a: number; b: number }[]
++) => pool.map(taskKey);
++
++describe("Aufgabenpools", () => {
++  it("enthält exakt sechs Pools mit jeweils sechs Aufgaben", () => {
++    expect(TASK_POOLS).toHaveLength(6);
++
++    for (const pool of TASK_POOLS) {
++      expect(pool).toHaveLength(6);
++    }
++  });
++
++  it("enthält die sechs verbindlichen Pools", () => {
++    expect(TASK_POOLS.map(poolKeys)).toEqual([
++      ["2x2", "3x2", "4x2", "5x2", "3x3", "4x4"],
++      ["6x2", "4x3", "5x5", "6x5", "7x2", "5x3"],
++      ["8x2", "9x2", "6x3", "5x4", "6x4", "7x3"],
++      ["8x3", "9x3", "7x4", "8x4", "9x4", "6x6"],
++      ["7x5", "8x5", "9x5", "7x7", "8x8", "9x9"],
++      ["7x6", "8x6", "9x6", "8x7", "9x8", "9x7"]
++    ]);
++  });
++
++  it("enthält im dritten Durchlauf exakt 64 Aufgaben", () => {
++    expect(ROUND_THREE_TASKS).toHaveLength(64);
++    expect(new Set(ROUND_THREE_TASKS.map(taskKey)).size).toBe(64);
++  });
++
++  it("enthält im dritten Durchlauf exakt die verbindliche Aufgabenmenge", () => {
++    const expected = [
++      "2x2", "3x2", "2x3", "4x2", "2x4", "5x2", "2x5",
++      "6x2", "2x6", "7x2", "2x7", "8x2", "2x8", "9x2",
++      "2x9", "3x3", "4x3", "3x4", "5x3", "3x5", "6x3",
++      "3x6", "7x3", "3x7", "8x3", "3x8", "9x3", "3x9",
++      "4x4", "5x4", "4x5", "6x4", "4x6", "7x4", "4x7",
++      "8x4", "4x8", "9x4", "4x9", "5x5", "6x5", "5x6",
++      "7x5", "5x7", "8x5", "5x8", "9x5", "5x9", "6x6",
++      "7x6", "6x7", "8x6", "6x8", "9x6", "6x9", "7x7",
++      "8x7", "7x8", "9x7", "7x9", "8x8", "9x8", "8x9",
++      "9x9"
++    ].sort();
++
++    expect(ROUND_THREE_TASKS.map(taskKey).sort()).toEqual(expected);
++  });
++
++  it("spielt jede Quadrataufgabe im dritten Durchlauf genau einmal", () => {
++    const squares = [
++      "2x2",
++      "3x3",
++      "4x4",
++      "5x5",
++      "6x6",
++      "7x7",
++      "8x8",
++      "9x9"
++    ];
++
++    const actual = ROUND_THREE_TASKS
++      .map(taskKey)
++      .filter((key) => squares.includes(key));
++
++    expect(actual.sort()).toEqual(squares.sort());
++  });
++});
++
++describe("Durchlauf 1", () => {
++  it("besteht aus exakt 36 Aufgaben", () => {
++    const round = createRoundOne(() => 0.5);
++    const tasks = flattenPools(round);
++
++    expect(tasks).toHaveLength(36);
++    expect(new Set(tasks.map(taskKey)).size).toBe(36);
++  });
++});
++
++describe("Durchlauf 2", () => {
++  it("besteht aus exakt 36 Aufgaben", () => {
++    const round = createRoundTwo(() => 0.5);
++    const tasks = flattenPools(round);
++
++    expect(tasks).toHaveLength(36);
++  });
++
++  it("vertauscht die Faktoren", () => {
++    const round = createRoundTwo(() => 0.5);
++    const actual = flattenPools(round)
++      .map(taskKey)
++      .sort();
++
++    const expected = [
++      "2x2", "2x3", "2x4", "2x5", "3x3", "4x4",
++      "2x6", "3x4", "5x5", "5x6", "2x7", "3x5",
++      "2x8", "2x9", "3x6", "4x5", "4x6", "3x7",
++      "3x8", "3x9", "4x7", "4x8", "4x9", "6x6",
++      "5x7", "5x8", "5x9", "7x7", "8x8", "9x9",
++      "6x7", "6x8", "6x9", "7x8", "8x9", "7x9"
++    ].sort();
++
++    expect(actual).toEqual(expected);
++  });
++
++  it("spielt die acht identischen Quadrataufgaben erneut", () => {
++    const round = createRoundTwo(() => 0.5);
++    const keys = flattenPools(round).map(taskKey);
++
++    for (const square of [
++      "2x2",
++      "3x3",
++      "4x4",
++      "5x5",
++      "6x6",
++      "7x7",
++      "8x8",
++      "9x9"
++    ]) {
++      expect(keys.filter((key) => key === square)).toHaveLength(1);
++    }
++  });
++});
++
++describe("Durchlauf 3", () => {
++  it("enthält exakt jede der 64 definierten Aufgaben einmal", () => {
++    const round = createRoundThree(() => 0.5);
++
++    expect(round).toHaveLength(64);
++    expect(new Set(round.map(taskKey)).size).toBe(64);
++    expect(new Set(round.map(taskKey))).toEqual(
++      new Set(ROUND_THREE_TASKS.map(taskKey))
++    );
++  });
++});
+diff --git a/tests/scoring.test.ts b/tests/scoring.test.ts
+new file mode 100644
+index 0000000..e6eddda
+--- /dev/null
++++ b/tests/scoring.test.ts
+@@ -0,0 +1,62 @@
++import { describe, expect, it } from "vitest";
++import {
++  awardedPoints,
++  basePoints
++} from "../src/domain/scoring";
++import {
++  multiplierForStreak
++} from "../src/domain/multiplier";
++
++describe("Punktesystem", () => {
++  it("liefert bei 0 Sekunden 100 Punkte", () => {
++    expect(basePoints(0)).toBe(100);
++  });
++
++  it("berechnet 0,5 Sekunden kontinuierlich", () => {
++    expect(basePoints(0.5)).toBeCloseTo(
++      100 * Math.pow(0.5, 0.25),
++      12
++    );
++  });
++
++  it("berechnet 1 Sekunde", () => {
++    expect(basePoints(1)).toBeCloseTo(
++      100 * Math.pow(0.5, 0.5),
++      12
++    );
++  });
++
++  it("liefert nach 2 Sekunden exakt 50 Basispunkte", () => {
++    expect(basePoints(2)).toBe(50);
++  });
++
++  it("liefert nach 4 Sekunden exakt 25 Basispunkte", () => {
++    expect(basePoints(4)).toBe(25);
++  });
++
++  it("wendet den Multiplikator vor dem Runden an", () => {
++    expect(awardedPoints(2, 2)).toBe(100);
++    expect(awardedPoints(4, 3)).toBe(75);
++  });
++});
++
++describe("Serienmultiplikator", () => {
++  it("bleibt bei 1 bis 2 richtigen Antworten bei 1", () => {
++    expect(multiplierForStreak(0)).toBe(1);
++    expect(multiplierForStreak(1)).toBe(1);
++    expect(multiplierForStreak(2)).toBe(1);
++  });
++
++  it("ist ab 3 richtigen Antworten 2", () => {
++    expect(multiplierForStreak(3)).toBe(2);
++    expect(multiplierForStreak(9)).toBe(2);
++  });
++
++  it("ist ab 10 richtigen Antworten 3", () => {
++    expect(multiplierForStreak(10)).toBe(3);
++    expect(multiplierForStreak(19)).toBe(3);
++  });
++
++  it("ist ab 20 richtigen Antworten 5", () => {
++    expect(multiplierForStreak(20)).toBe(5);
++    expect(multiplierForStreak(100)).toBe(5);
++  });
++});
+diff --git a/public/manifest.webmanifest b/public/manifest.webmanifest
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/public/manifest.webmanifest
+@@ -0,0 +1,16 @@
++{
++  "name": "Einmaleins",
++  "short_name": "Einmaleins",
++  "description": "Spielerisches Einmaleinstraining",
++  "lang": "de",
++  "start_url": "/",
++  "scope": "/",
++  "display": "standalone",
++  "orientation": "landscape",
++  "background_color": "#0f172a",
++  "theme_color": "#0f172a"
++}
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..abf7df1
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,46 @@
++# Einmaleins
++
++Einmaleins-Trainings-App für iPads.
++
++## Entwicklungsstand
++
++Das Repository befindet sich im initialen Aufbau.
++
++Aktuell enthalten:
++
++- TypeScript-Projektstruktur
++- Vite-Buildsystem
++- Vitest-Testumgebung
++- sechs verbindliche Aufgabenpools
++- exakt 36 Aufgaben für Durchlauf 1
++- Durchlauf 2 mit vertauschten Faktoren
++- exakt 64 Aufgaben für Durchlauf 3
++- zufällige Aufgabenreihenfolge
++- injizierbare Zufallsquelle für Tests
++- kontinuierliche Punktberechnung
++- Serienmultiplikator
++- erste PWA-/Standalone-Konfiguration
++
++Noch nicht implementiert:
++
++- eigentliche Spieloberfläche
++- Touch-Zahlenfeld
++- 10-Minuten-Spieltimer
++- explizites Spielzustandsmodell
++- unmittelbares Feedback
++- persönlicher Highscore
++- lokale Speicherung
++- Offline-Synchronisation
++- schulweite Highscoreliste
++- Backend
++- Jamf-School-Integration
++- vollständige PWA-Service-Worker-Logik
++- App-Icon
++- vollständige UI- und End-to-End-Tests
++
++## Entwicklung
++
++Abhängigkeiten installieren:
++
++```bash
++npm install
++```
++
++Entwicklungsserver starten:
++
++```bash
++npm run dev
++```
++
++Tests ausführen:
++
++```bash
++npm test
++```
++
++Produktionsbuild:
++
++```bash
++npm run build
++```
+diff --git a/IMPLEMENTATION_STATUS.md b/IMPLEMENTATION_STATUS.md
+new file mode 100644
+index 0000000..7d15dc5
+--- /dev/null
++++ b/IMPLEMENTATION_STATUS.md
+@@ -0,0 +1,76 @@
++# Implementation Status
++
++## Projektziel
++
++Entwicklung einer kindgerechten Einmaleins-Trainings-App als PWA für iPads.
++
++Die App soll offline robust funktionieren und später eine schulweite Online-
++Highscoreliste unterstützen.
++
++## Aktuelle Architektur
++
++Initiale TypeScript/Vite-Anwendung.
++
++Die fachliche Kernlogik wird zunächst ohne UI und ohne Backend entwickelt.
++
++Aktuelle Domänenmodule:
++
++- `src/domain/tasks.ts`
++- `src/domain/rounds.ts`
++- `src/domain/scoring.ts`
++- `src/domain/multiplier.ts`
++
++## Implementiert
++
++- sechs verbindliche Aufgabenpools
++- exakt 36 Aufgaben für Durchlauf 1
++- Faktorentausch für Durchlauf 2
++- erneutes Spielen der identischen Quadrataufgaben in Durchlauf 2
++- exakt 64 verbindliche Aufgaben für Durchlauf 3
++- zufällige Reihenfolge
++- injizierbare Zufallsquelle für Tests
++- Punktformel `100 × 0,5^(t / 2)`
++- Multiplikator vor dem finalen Runden
++- Serienmultiplikator 1/2/3/5
++- erste PWA-Manifest-Grundlage
++
++## Offene Aufgaben
++
++- Spielzustandsmodell
++- Aufgabenbearbeitung
++- unmittelbares Feedback
++- 10-Minuten-Timer
++- Eingabelogik für ein- und zweistellige Ergebnisse
++- Ergebnisbildschirm
++- persönlicher Highscore
++- lokale Speicherung
++- Offline-Synchronisation
++- Backend für schulweite Highscores
++- Jamf-School-Integration
++- PWA-Service-Worker
++- responsive iPad-Oberfläche
++- App-Icon
++- vollständige UI-Tests
++- End-to-End-Tests
++
++## Bekannte Fehler
++
++Keine bekannten Fehler in der bisher statisch angelegten Domänenlogik.
++
++## Aktueller Implementierungsstand
++
++Initialer Domänenkern.
++
++Noch keine produktive Spielrunde.
++
++## Zuletzt abgeschlossener Arbeitsschritt
++
++Initiale Projektstruktur und testbare Definition der Aufgaben, Durchläufe,
++Punkte und Serienmultiplikatoren.
++
++## Nächster sinnvoller Arbeitsschritt
++
++Explizites Spielzustandsmodell für:
++
++1. Start
++2. Durchlauf 1
++3. Durchlauf 2
++4. Durchlauf 3
++5. Rundensieg
++6. Zeitablauf
++7. Ergebnis
++
++Danach sollte die Eingabelogik darauf aufbauen.
++
++## Architekturentscheidungen
++
++- Vite + TypeScript
++- Vitest für automatisierte Tests
++- keine UI-/Backend-Abhängigkeit in der Domänenlogik
++- Aufgabenlisten zentral und unveränderlich
++- Zufallsquelle injizierbar
++- Punktberechnung deterministisch
++- Rundung erst nach Multiplikation
++- keine kostenpflichtigen externen Dienste
++
++## Teststatus
++
++Die Tests sind im Repository angelegt.
++
++Sie wurden beim Erstellen dieses Patches nicht ausgeführt.
++
++## Buildstatus
++
++Der Build wurde beim Erstellen dieses Patches nicht ausgeführt.
++
++## Nicht durchführbare Prüfungen
++
++- `npm install`
++- Typecheck
++- Vitest
++- Vite-Build
++- echter iPad-Test
++- PWA-Installation
++- Offline-/Online-Synchronisation
++- Jamf-School-Integration
++- Backend-End-to-End-Test
++
++## Hinweise für die nächste Sitzung
++
++Vor Weiterentwicklung erneut den tatsächlichen Repository-Zustand prüfen.
++
++Insbesondere die Domänenlogik nicht unnötig verändern.
++
++Als Nächstes ein explizites Zustandsmodell für eine laufende Spielrunde
++implementieren.
+
