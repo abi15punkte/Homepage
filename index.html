@@ -158,7 +158,7 @@
   /* ---------- News teaser ---------- */
   .news-teaser-wrap{
     background:var(--blue-50);
-    padding:28px clamp(20px, 4vw, 64px);
+    padding:2.5vh clamp(20px, 4vw, 64px);
   }
   .news-teaser{
     width:100%;
@@ -392,10 +392,10 @@
     .news-teaser-text h2{font-size:2.4rem;}
     .news-teaser-text p{font-size:1.35rem;}
   }
-  /* ---------- Startseiten-Teaser: 10% größer, 70/30-Aufteilung ---------- */
+  /* ---------- Startseiten-Teaser: responsive Höhe und 70/30-Aufteilung ---------- */
   .news-teaser{
-    height:286px;
-    min-height:286px;
+    height:40vh;
+    min-height:40vh;
     display:grid;
     grid-template-columns:1fr;
     grid-template-rows:70% 30%;
@@ -463,10 +463,6 @@
   }
 
   @media (orientation:landscape){
-    .news-teaser{
-      height:572px;
-      min-height:572px;
-    }
     .news-teaser-text h2{
       font-size:2.4rem;
     }
@@ -476,10 +472,6 @@
   }
 
   @media (max-width:720px){
-    .news-teaser{
-      height:286px;
-      min-height:286px;
-    }
     .news-teaser-text{
       padding:16px 20px;
     }
@@ -861,15 +853,10 @@
     }
   }, { passive: true });
 
-  // Im Hochformat wird zuerst die ursprüngliche Kartenhöhe der mobilen
-  // Spaltenansicht ermittelt und danach als feste Höhe für das 70/30-Grid verwendet.
+  // Die Höhe wird ausschließlich per CSS in vh gesteuert.
   function balancePortraitTeasers(){
-    // Die Teaser-Höhe ist bewusst 10 % größer als zuvor:
-    // 260px -> 286px im Hochformat bzw. 520px -> 572px im Querformat.
-    const landscape = window.matchMedia('(orientation:landscape)').matches;
-    const targetHeight = landscape ? '572px' : '286px';
     document.querySelectorAll('.news-teaser').forEach(teaser => {
-      teaser.style.height = targetHeight;
+      teaser.style.removeProperty('height');
     });
   }
 
