@@ -350,27 +350,13 @@
   }
 
   @media (max-width:720px) and (orientation:portrait){
-    /* Testoptimierung der Main-Page-Teaser im Hochformat:
-       Bild = 60% der Elementhöhe, Text = 40%. */
-    .news-teaser{
-      height:clamp(420px, 70vh, 560px);
-      min-height:0;
-    }
-    .news-teaser-image{
-      flex:0 0 60%;
-      min-height:0;
-    }
-    .news-teaser-text{
-      flex:0 0 40%;
-      min-height:0;
-      padding:24px 22px;
-    }
+    /* Nur die Aufteilung der bestehenden Kartengröße ändern. */
     .lupe-btn{
-      top:16px;
+      top:auto;
       right:16px;
-      bottom:auto;
-      background:rgba(255,255,255,0.60);
+      bottom:16px;
       z-index:3;
+      background:rgba(255,255,255,0.60);
     }
     .lupe-btn:hover{
       background:rgba(105,242,133,0.92);
@@ -757,6 +743,34 @@
     }
   }, { passive: true });
 
+  // Im Hochformat wird die bestehende Kartenhöhe beibehalten und nur auf 60/40 aufgeteilt.
+  function balancePortraitTeasers(){
+    const portrait = window.matchMedia('(max-width:720px) and (orientation:portrait)').matches;
+    document.querySelectorAll('.news-teaser').forEach(teaser => {
+      const image = teaser.querySelector('.news-teaser-image');
+      const text = teaser.querySelector('.news-teaser-text');
+      if (!image || !text) return;
+
+      if (!portrait) {
+        teaser.style.height = '';
+        image.style.height = '';
+        text.style.height = '';
+        return;
+      }
+
+      teaser.style.height = '';
+      image.style.height = '';
+      text.style.height = '';
+
+      const totalHeight = teaser.getBoundingClientRect().height;
+      if (!totalHeight) return;
+
+      teaser.style.height = totalHeight + 'px';
+      image.style.height = (totalHeight * 0.60) + 'px';
+      text.style.height = (totalHeight * 0.40) + 'px';
+    });
+  }
+
   // ---------- Teaser: Reveal, Peek-Hint, Swipe-to-open, Lupe, Close ----------
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const overlayRoutes = {
@@ -868,6 +882,8 @@
   }
 
   document.querySelectorAll('.news-teaser').forEach(initTeaser);
+  balancePortraitTeasers();
+  window.addEventListener('resize', balancePortraitTeasers);
 
   // ---------- Neuigkeiten: einzelne Beitragsseiten ----------
   const articleDetails = [
