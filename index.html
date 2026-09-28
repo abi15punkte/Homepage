@@ -348,6 +348,34 @@
     .date-block{padding:2px 0;}
     .month-divider span{font-size:1.1rem;}
   }
+
+  @media (max-width:720px) and (orientation:portrait){
+    /* Testoptimierung der Main-Page-Teaser im Hochformat:
+       Bild = 60% der Elementhöhe, Text = 40%. */
+    .news-teaser{
+      height:clamp(420px, 70vh, 560px);
+      min-height:0;
+    }
+    .news-teaser-image{
+      flex:0 0 60%;
+      min-height:0;
+    }
+    .news-teaser-text{
+      flex:0 0 40%;
+      min-height:0;
+      padding:24px 22px;
+    }
+    .lupe-btn{
+      top:16px;
+      right:16px;
+      bottom:auto;
+      background:rgba(255,255,255,0.60);
+      z-index:3;
+    }
+    .lupe-btn:hover{
+      background:rgba(105,242,133,0.92);
+    }
+  }
   @media (max-width:400px){
     .site-header{padding:0 10px;}
     .brand{gap:6px;}
