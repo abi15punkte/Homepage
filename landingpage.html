@@ -349,12 +349,30 @@
     .month-divider span{font-size:1.1rem;}
   }
   @media (max-width:720px) and (orientation:portrait){
-    /* Mobile Hochformat: bestehende Kartengröße beibehalten, nur 70/30 aufteilen. */
+    /* Mobile Hochformat: gleiche Gesamthöhe, exakt 70% Bild / 30% Text. */
+    .news-teaser{
+      display:grid;
+      grid-template-rows:70% 30%;
+      flex-direction:initial;
+    }
+    .news-teaser-image{
+      min-height:0;
+      height:auto;
+      grid-row:1;
+      grid-column:1;
+    }
+    .news-teaser-text{
+      min-height:0;
+      height:auto;
+      grid-row:2;
+      grid-column:1;
+    }
     .lupe-btn{
-      top:calc(70% - 70px);
+      position:absolute;
+      top:auto;
       right:16px;
-      bottom:auto;
-      z-index:3;
+      bottom:calc(30% + 16px);
+      z-index:4;
       background:rgba(255,255,255,0.60);
     }
     .lupe-btn:hover{background:rgba(105,242,133,0.92);}
@@ -741,36 +759,29 @@
     }
   }, { passive: true });
 
-  // Im Hochformat bleibt die bisherige Gesamthöhe der Karte erhalten;
-  // nur das Verhältnis von Bild zu Text wird auf 70/30 gesetzt.
+  // Im Hochformat wird die bestehende natürliche Kartenhöhe beibehalten.
+  // Das Grid übernimmt danach die exakte 70/30-Aufteilung.
   function balancePortraitTeasers(){
     const portrait = window.matchMedia('(max-width:720px) and (orientation:portrait)').matches;
     document.querySelectorAll('.news-teaser').forEach(teaser => {
-      const image = teaser.querySelector('.news-teaser-image');
-      const text = teaser.querySelector('.news-teaser-text');
-      if (!image || !text) return;
-
       if (!portrait) {
         teaser.style.height = '';
-        image.style.height = '';
-        text.style.height = '';
         return;
       }
 
+      const previousDisplay = teaser.style.display;
+      const previousHeight = teaser.style.height;
+      teaser.style.display = 'flex';
       teaser.style.height = '';
-      image.style.height = '';
-      text.style.height = '';
-
       const totalHeight = teaser.getBoundingClientRect().height;
-      if (!totalHeight) return;
+      teaser.style.display = previousDisplay;
+      teaser.style.height = previousHeight;
 
-      teaser.style.height = totalHeight + 'px';
-      image.style.height = (totalHeight * 0.70) + 'px';
-      text.style.height = (totalHeight * 0.30) + 'px';
+      if (totalHeight) teaser.style.height = totalHeight + 'px';
     });
   }
 
-  // ---------- Teaser: Reveal, Peek-Hint, Swipe-to-open, Lupe, Close ----------
+  // ---------- Teaser/: Reveal, Peek-Hint, Swipe-to-open, Lupe, Close ----------
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const overlayRoutes = {
     newsOverlay: '#neuigkeiten',
