@@ -759,8 +759,8 @@
     }
   }, { passive: true });
 
-  // Im Hochformat wird die bestehende natürliche Kartenhöhe beibehalten.
-  // Das Grid übernimmt danach die exakte 70/30-Aufteilung.
+  // Im Hochformat wird zuerst die ursprüngliche Kartenhöhe der mobilen
+  // Spaltenansicht ermittelt und danach als feste Höhe für das 70/30-Grid verwendet.
   function balancePortraitTeasers(){
     const portrait = window.matchMedia('(max-width:720px) and (orientation:portrait)').matches;
     document.querySelectorAll('.news-teaser').forEach(teaser => {
@@ -770,18 +770,25 @@
       }
 
       const previousDisplay = teaser.style.display;
+      const previousFlexDirection = teaser.style.flexDirection;
       const previousHeight = teaser.style.height;
+
+      // Originale mobile Anordnung nur für die Höhenmessung wiederherstellen.
       teaser.style.display = 'flex';
+      teaser.style.flexDirection = 'column';
       teaser.style.height = '';
+
       const totalHeight = teaser.getBoundingClientRect().height;
+
       teaser.style.display = previousDisplay;
+      teaser.style.flexDirection = previousFlexDirection;
       teaser.style.height = previousHeight;
 
       if (totalHeight) teaser.style.height = totalHeight + 'px';
     });
   }
 
-  // ---------- Teaser/: Reveal, Peek-Hint, Swipe-to-open, Lupe, Close ----------
+  // ---------- Teaser:/: Reveal, Peek-Hint, Swipe-to-open, Lupe, Close ----------
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const overlayRoutes = {
     newsOverlay: '#neuigkeiten',
