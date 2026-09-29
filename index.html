@@ -48,7 +48,7 @@
     height:var(--header-h);
     display:flex; align-items:center; justify-content:space-between;
     padding:0 20px;
-    background:var(--white);
+    background:rgba(255,255,255,0.5); /* 50 % transparent */
     box-shadow:0 4px 18px rgba(30,79,191,0.08);
   }
   .brand{display:flex; align-items:center; gap:12px;}
@@ -172,7 +172,7 @@
     margin:0 auto;
     display:flex;
     min-height:260px;
-    background:var(--white);
+    background:rgba(255,255,255,0.7); /* 30 % transparent */
     border-radius:var(--radius-lg);
     overflow:hidden;
     box-shadow:var(--shadow-soft);
@@ -339,7 +339,7 @@
   :root{ --bg-fade:0.8; }
 
   @media (orientation:portrait){
-    body{
+    body, .news-overlay{
       background-color:#ece7d3; /* Papierton des Bildes, falls es noch lädt */
       background-image:
         linear-gradient(rgba(255,255,255,var(--bg-fade)), rgba(255,255,255,var(--bg-fade))),
@@ -350,7 +350,7 @@
     }
   }
   @media (orientation:landscape){
-    body{
+    body, .news-overlay{
       background-color:var(--blue-50); /* Ersatzfarbe, solange Hintergrund-quer.png fehlt */
       background-image:
         linear-gradient(rgba(255,255,255,var(--bg-fade)), rgba(255,255,255,var(--bg-fade))),
@@ -360,6 +360,8 @@
       background-position:center top, center top;
     }
   }
+  /* Unterseiten (Overlays) scrollen intern: 'local' lässt den Hintergrund mit dem Inhalt mitlaufen. */
+  .news-overlay{ background-attachment:local, local; }
 
   /* =====================================================================
      KLEINE BILDSCHIRME: nur Header und Listen-Feinheiten.
@@ -430,7 +432,7 @@
       min-height:0;
       height:auto;
       padding:20px 30px;
-      background:rgba(255,255,255,.5);
+      background:transparent; /* weißer Hintergrund (30 % transparent) kommt von .news-teaser */
       display:flex;
       flex-direction:column;
       justify-content:center;
