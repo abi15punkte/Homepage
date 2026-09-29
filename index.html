@@ -73,7 +73,8 @@
   /* ---------- Hero Slider ---------- */
   .hero{
     position:relative;
-    height:calc(100vh - var(--header-h));
+    margin-top:calc(-1 * var(--header-h)); /* 10vh nach oben, teilweise hinter den Header */
+    height:calc(100vh - var(--header-h) + 5vh); /* 95vh */
     min-height:380px;
     overflow:hidden;
     touch-action:pan-y;
