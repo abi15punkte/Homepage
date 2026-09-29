@@ -334,16 +334,30 @@
      Hochformat -> Hintergrund.png       (hochkant, vorhanden)
      Querformat -> Hintergrund-quer.png  (noch zu erstellen; bis dahin gilt die Ersatzfarbe)
      ===================================================================== */
+  /* Aufhellung: weiße Schicht über dem Bild. 0 = Bild unverändert, 1 = komplett weiß.
+     Aktuell 50 % -> hier einfach den Wert anpassen. */
+  :root{ --bg-fade:0.5; }
+
   @media (orientation:portrait){
     body{
       background-color:#ece7d3; /* Papierton des Bildes, falls es noch lädt */
-      background-image:url('Hintergrund.png');
+      background-image:
+        linear-gradient(rgba(255,255,255,var(--bg-fade)), rgba(255,255,255,var(--bg-fade))),
+        url('Hintergrund.png');
+      background-size:100% 100%, 100% auto;
+      background-repeat:no-repeat, repeat-y;
+      background-position:center top, center top;
     }
   }
   @media (orientation:landscape){
     body{
       background-color:var(--blue-50); /* Ersatzfarbe, solange Hintergrund-quer.png fehlt */
-      background-image:url('Hintergrund-quer.png');
+      background-image:
+        linear-gradient(rgba(255,255,255,var(--bg-fade)), rgba(255,255,255,var(--bg-fade))),
+        url('Hintergrund-quer.png');
+      background-size:100% 100%, 100% auto;
+      background-repeat:no-repeat, repeat-y;
+      background-position:center top, center top;
     }
   }
 
