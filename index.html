@@ -995,9 +995,8 @@
     history.replaceState(null, '', window.location.pathname + window.location.search);
   }
 
-  function initTeaser(teaser){
+  function initTeaser(teaser, index){
     const overlay = document.getElementById(teaser.dataset.overlay);
-    const teaserWrap = teaser.parentElement;
     const lupeBtn = teaser.querySelector('.lupe-btn');
     const closeBtn = overlay.querySelector('.back-btn');
     let peekLoopTimer = null;
@@ -1018,16 +1017,10 @@
       peekLoopTimer = null;
     }
 
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          teaser.classList.add('visible');
-          setTimeout(startPeekLoop, 700);
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.35 });
-    revealObserver.observe(teaserWrap);
+    // Alle Teaser werden sofort beim Laden aufgebaut. Nur der Wischhinweis (Peek)
+    // startet je Teaser um 1 Sekunde versetzt (Teaser 1: 0,7 s, Teaser 2: 1,7 s, ...).
+    teaser.classList.add('visible');
+    setTimeout(startPeekLoop, 700 + index * 1000);
 
     function openSubpage(){
       stopPeekLoop();
