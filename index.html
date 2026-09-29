@@ -338,8 +338,9 @@
      Querformat -> Hintergrund-quer.png  (noch zu erstellen; bis dahin gilt die Ersatzfarbe)
      ===================================================================== */
   /* Aufhellung: weiße Schicht über dem Bild. 0 = Bild unverändert, 1 = komplett weiß.
-     Aktuell 85 % -> hier einfach den Wert anpassen. */
-  :root{ --bg-fade:0.92; }
+     Aktuell 90 % (Termine-Unterseite 95 %) -> hier einfach den Wert anpassen. */
+  :root{ --bg-fade:0.90; }
+  #datesOverlay{ --bg-fade:0.95; } /* Termine-Unterseite: 95 % */
 
   @media (orientation:portrait){
     body, .news-overlay{
