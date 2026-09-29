@@ -1,39 +1,17 @@
 /* Landingpage Parallax
-   Der Effekt verändert ausschließlich die Bild-/Hintergrundebene.
-   Der eigentliche Layout-Container bleibt unverändert.
+   Die Animation verändert ausschließlich die Hintergrunddarstellung
+   innerhalb des bestehenden Bildcontainers. Der Layout-Container selbst
+   wird niemals transformiert.
  */
 
-.parallax-layer,
-.parallax-media {
-  will-change: transform;
-  transform-origin: 0 0;
-  backface-visibility: hidden;
-}
-
-.parallax-background {
-  overflow: hidden;
-}
-
-/*
- * Die Hero-Slides sind bereits absolute Layout-Container und müssen
- * diese Positionierung behalten. Die Teaser-Bilder sind dagegen
- * Grid-/Flex-Kinder und benötigen für die absolute Parallax-Ebene
- * einen eigenen Containing Block.
- */
-.hero-slide.parallax-background {
-  position: absolute;
-}
-
-.news-teaser-image.parallax-background {
-  position: relative;
-  min-width: 0;
-  min-height: 0;
+.news-teaser-image,
+.hero-slide {
+  background-repeat: no-repeat;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .parallax-layer,
-  .parallax-media {
+  .news-teaser-image,
+  .hero-slide {
     will-change: auto;
-    transform: none !important;
   }
 }
