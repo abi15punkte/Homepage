@@ -59,15 +59,15 @@
     display:flex; align-items:center; gap:8px;
     height:var(--header-content-h);
     min-height:0;
-    background:var(--blue-50);
-    padding:0 16px;
-    border-radius:999px;
+    background:none;
+    padding:0;
+    font-size:1.1rem;
     font-weight:700;
     color:var(--blue-700);
-    transition:background .2s ease, transform .15s ease;
+    transition:transform .15s ease;
   }
-  .phone-link svg{width:20px; height:20px; stroke:var(--blue-600); flex-shrink:0;}
-  .phone-link:hover{background:var(--yellow-400); color:var(--blue-700); transform:translateY(-1px);}
+  .phone-link svg{width:22px; height:22px; stroke:var(--blue-600); flex-shrink:0;}
+  .phone-link:hover{color:var(--blue-700); transform:translateY(-1px);}
   .phone-link span.full{display:inline;}
 
   /* ---------- Hero Slider ---------- */
@@ -316,9 +316,8 @@
     display:grid; grid-template-columns:70px 1fr; gap:20px;
     align-items:start;
     padding:20px 4px;
-    border-bottom:1px solid #000;
   }
-  .date-item:last-child{border-bottom:none; padding-bottom:0;}
+  .date-item:last-child{padding-bottom:0;}
   .date-block{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     padding:4px 0;
@@ -374,8 +373,8 @@
   @media (max-width:720px){
     .site-header{padding:0 12px;}
     .brand{gap:8px;}
-    .phone-link{padding:0 10px; gap:6px; font-size:.8rem;}
-    .phone-link svg{width:17px; height:17px;}
+    .phone-link{padding:0; gap:6px; font-size:.88rem;}
+    .phone-link svg{width:18.7px; height:18.7px;}
     .phone-link span.full{display:inline;}
     .news-item-body{padding:14px 16px 16px;}
     .date-item{grid-template-columns:54px 1fr; gap:14px;}
@@ -386,8 +385,8 @@
   @media (max-width:400px){
     .site-header{padding:0 10px;}
     .brand{gap:6px;}
-    .phone-link{padding:0 8px; gap:4px; font-size:.72rem;}
-    .phone-link svg{width:15px; height:15px;}
+    .phone-link{padding:0; gap:4px; font-size:.792rem;}
+    .phone-link svg{width:16.5px; height:16.5px;}
   }
 
   /* =====================================================================
@@ -713,6 +712,40 @@
         </div>
       </article>
 
+      <article class="date-item">
+        <div class="date-block">
+          <span class="date-day">24</span>
+          <span class="date-weekday">Do</span>
+        </div>
+        <div class="date-body">
+          <div class="date-meta">
+            <span class="date-time">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              08:00 – 09:30 Uhr
+            </span>
+          </div>
+          <h3>Testtermin: Schulversammlung</h3>
+          <p>Platzhaltertext zum Testen der Darstellung.</p>
+        </div>
+      </article>
+
+      <article class="date-item">
+        <div class="date-block">
+          <span class="date-day">30</span>
+          <span class="date-weekday">Mi</span>
+        </div>
+        <div class="date-body">
+          <div class="date-meta">
+            <span class="date-time">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              14:00 – 15:00 Uhr
+            </span>
+          </div>
+          <h3>Testtermin: Klassenpflegschaft</h3>
+          <p>Platzhaltertext zum Testen der Darstellung.</p>
+        </div>
+      </article>
+
       <div class="month-divider"><span>Oktober 2026</span></div>
       <article class="date-item">
         <div class="date-block">
@@ -731,7 +764,75 @@
         </div>
       </article>
 
+      <article class="date-item">
+        <div class="date-block">
+          <span class="date-day">12</span>
+          <span class="date-weekday">Mo</span>
+        </div>
+        <div class="date-body">
+          <div class="date-meta">
+            <span class="date-time">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              09:00 – 10:00 Uhr
+            </span>
+          </div>
+          <h3>Testtermin: Projektwoche Auftakt</h3>
+          <p>Platzhaltertext zum Testen der Darstellung.</p>
+        </div>
+      </article>
+
+      <article class="date-item">
+        <div class="date-block">
+          <span class="date-day">22</span>
+          <span class="date-weekday">Do</span>
+        </div>
+        <div class="date-body">
+          <div class="date-meta">
+            <span class="date-time">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              15:00 – 17:00 Uhr
+            </span>
+          </div>
+          <h3>Testtermin: Herbstbasar</h3>
+          <p>Platzhaltertext zum Testen der Darstellung.</p>
+        </div>
+      </article>
+
       <div class="month-divider"><span>Dezember 2026</span></div>
+      <article class="date-item">
+        <div class="date-block">
+          <span class="date-day">04</span>
+          <span class="date-weekday">Fr</span>
+        </div>
+        <div class="date-body">
+          <div class="date-meta">
+            <span class="date-time">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              16:00 – 18:00 Uhr
+            </span>
+          </div>
+          <h3>Testtermin: Adventssingen</h3>
+          <p>Platzhaltertext zum Testen der Darstellung.</p>
+        </div>
+      </article>
+
+      <article class="date-item">
+        <div class="date-block">
+          <span class="date-day">11</span>
+          <span class="date-weekday">Fr</span>
+        </div>
+        <div class="date-body">
+          <div class="date-meta">
+            <span class="date-time">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              10:00 – 12:00 Uhr
+            </span>
+          </div>
+          <h3>Testtermin: Weihnachtsbasteln</h3>
+          <p>Platzhaltertext zum Testen der Darstellung.</p>
+        </div>
+      </article>
+
       <article class="date-item">
         <div class="date-block">
           <span class="date-day">23</span>
