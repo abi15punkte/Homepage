@@ -1,0 +1,24 @@
+/* Landingpage Parallax
+   Die eigentliche Bewegung wird per JavaScript berechnet.
+   Diese Klasse sorgt nur für GPU-freundliches Rendering und verhindert
+   sichtbare Transform-Übergänge während des Scrollens. */
+
+.parallax-layer,
+.parallax-media {
+  will-change: transform;
+  transform-origin: 0 0;
+  backface-visibility: hidden;
+}
+
+.parallax-background {
+  position: relative;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parallax-layer,
+  .parallax-media {
+    will-change: auto;
+    transform: none !important;
+  }
+}
