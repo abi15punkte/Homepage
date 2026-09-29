@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sonnenblick-Grundschule</title>
+<title>Astrid-Lindgren-Schule</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -29,11 +29,12 @@
     font-family:'Nunito',sans-serif;
     color:var(--ink-900);
     background-color:var(--white);
-    background-image:url('Hintergrund.png');
-    background-position:center center;
-    background-size:cover;
-    background-repeat:no-repeat;
-    background-attachment:fixed;
+    /* Hintergrund scrollt mit der Seite: Breite = Bildschirmbreite, Höhe folgt dem Seitenverhältnis,
+       bei längerer Seite wird das Bild senkrecht wiederholt. */
+    background-position:center top;
+    background-size:100% auto;
+    background-repeat:repeat-y;
+    background-attachment:scroll;
     -webkit-tap-highlight-color:transparent;
   }
   h1,h2{font-family:'Fredoka',sans-serif; font-weight:600; margin:0;}
@@ -162,7 +163,7 @@
 
   /* ---------- News teaser ---------- */
   .news-teaser-wrap{
-    background:var(--blue-50);
+    background:transparent; /* damit das Hintergrundbild vom body sichtbar bleibt */
     padding:2.5vh clamp(20px, 4vw, 64px);
   }
   .news-teaser{
@@ -328,6 +329,28 @@
   .date-body h3{font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.12rem; margin:0; color:var(--blue-700);}
   .date-body p{margin:5px 0 0; font-size:.92rem; line-height:1.55; color:var(--ink-900);}
 
+  /* =====================================================================
+     SEITENHINTERGRUND: je Ausrichtung ein eigenes Bild
+     Hochformat -> Hintergrund.png       (hochkant, vorhanden)
+     Querformat -> Hintergrund-quer.png  (noch zu erstellen; bis dahin gilt die Ersatzfarbe)
+     ===================================================================== */
+  @media (orientation:portrait){
+    body{
+      background-color:#ece7d3; /* Papierton des Bildes, falls es noch lädt */
+      background-image:url('Hintergrund.png');
+    }
+  }
+  @media (orientation:landscape){
+    body{
+      background-color:var(--blue-50); /* Ersatzfarbe, solange Hintergrund-quer.png fehlt */
+      background-image:url('Hintergrund-quer.png');
+    }
+  }
+
+  /* =====================================================================
+     KLEINE BILDSCHIRME: nur Header und Listen-Feinheiten.
+     Hat bewusst NICHTS mit der Teaser-Architektur zu tun.
+     ===================================================================== */
   @media (max-width:720px){
     .site-header{padding:0 12px;}
     .brand{gap:8px;}
@@ -335,54 +358,12 @@
     .phone-link{padding:7px 10px; gap:6px; font-size:.8rem;}
     .phone-link svg{width:17px; height:17px;}
     .phone-link span.full{display:inline;}
-    .news-teaser{flex-direction:column;}
-    .news-teaser-image{min-height:190px;}
-    .lupe-btn{
-      position:absolute; right:16px; bottom:16px;
-      width:54px; height:54px;
-      border-radius:50%;
-      border:none;
-      background:rgba(255,255,255,0.88);
-      box-shadow:var(--shadow-soft);
-      flex:none;
-    }
-    .lupe-btn:hover{background:var(--yellow-400); transform:scale(1.06);}
     .news-item-body{padding:14px 16px 16px;}
     .date-item{grid-template-columns:54px 1fr; gap:14px;}
     .date-day{font-size:1.5rem;}
     .date-block{padding:2px 0;}
     .month-divider span{font-size:1.1rem;}
   }
-  @media (max-width:720px) and (orientation:portrait){
-    /* Mobile Hochformat: gleiche Gesamthöhe, exakt 70% Bild / 30% Text. */
-    .news-teaser{
-      display:grid;
-      grid-template-rows:70% 30%;
-      flex-direction:initial;
-    }
-    .news-teaser-image{
-      min-height:0;
-      height:auto;
-      grid-row:1;
-      grid-column:1;
-    }
-    .news-teaser-text{
-      min-height:0;
-      height:auto;
-      grid-row:2;
-      grid-column:1;
-    }
-    .lupe-btn{
-      position:absolute;
-      top:auto;
-      right:16px;
-      bottom:calc(30% + 16px);
-      z-index:4;
-      background:rgba(255,255,255,0.60);
-    }
-    .lupe-btn:hover{background:rgba(105,242,133,0.92);}
-  }
-
   @media (max-width:400px){
     .site-header{padding:0 10px;}
     .brand{gap:6px;}
@@ -390,97 +371,97 @@
     .phone-link{padding:6px 8px; gap:4px; font-size:.72rem;}
     .phone-link svg{width:15px; height:15px;}
   }
+
+  /* =====================================================================
+     STARTSEITEN-TEASER: ARCHITEKTUR NACH BILDSCHIRMAUSRICHTUNG
+     Die beiden Blöcke unten schließen sich gegenseitig aus. Die Auswahl
+     erfolgt ausschließlich über die Ausrichtung, nicht über die Breite.
+     ===================================================================== */
+
+  /* ---------- QUERFORMAT: Bild links (60 %), Text rechts, Lupe als Streifen ---------- */
   @media (orientation:landscape){
-    .news-teaser{min-height:520px;}
+    .news-teaser{
+      display:flex;
+      flex-direction:row;
+      min-height:520px;
+    }
     .news-teaser-image{flex:0 0 60%;}
     .news-teaser-text{flex:1 1 auto;}
     .news-teaser-text h2{font-size:2.4rem;}
     .news-teaser-text p{font-size:1.35rem;}
-  }
-  /* ---------- Startseiten-Teaser: responsive Höhe und 70/30-Aufteilung ---------- */
-  .news-teaser{
-    height:40vh;
-    min-height:40vh;
-    display:grid;
-    grid-template-columns:1fr;
-    grid-template-rows:70% 30%;
+    /* .lupe-btn: Basisdefinition (Streifen rechts, order:3) bleibt unverändert */
   }
 
-  .news-teaser-image{
-    grid-row:1;
-    grid-column:1;
-    width:100%;
-    height:auto;
-    min-height:0;
-    flex:none;
-  }
-
-  .news-teaser-text{
-    position:static;
-    grid-row:2;
-    grid-column:1;
-    min-height:0;
-    height:auto;
-    padding:20px 30px;
-    background:rgba(255,255,255,.5);
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    gap:0;
-  }
-
-  .news-teaser-text h2{
-    position:absolute;
-    left:30px;
-    bottom:calc(30% + 18px);
-    z-index:3;
-    margin:0;
-    color:var(--white);
-    font-size:2rem;
-    text-shadow:0 2px 8px rgba(0,0,0,.45);
-    pointer-events:none;
-  }
-
-  .news-teaser-text p{
-    margin:0;
-    max-width:none;
-    color:var(--ink-900);
-    font-size:1rem;
-    line-height:1.6;
-  }
-
-  .lupe-btn{
-    position:absolute;
-    right:16px;
-    bottom:calc(30% + 16px);
-    z-index:4;
-    width:54px;
-    height:54px;
-    flex:none;
-    border:none;
-    border-radius:50%;
-    background:rgba(255,255,255,.3);
-    box-shadow:var(--shadow-soft);
-  }
-
-  .lupe-btn:hover{
-    background:var(--yellow-400);
-    transform:scale(1.06);
-  }
-
-  @media (orientation:landscape){
+  /* ---------- HOCHFORMAT: Bild oben (70 %), Text unten (30 %), Titel und Lupe auf dem Bild ---------- */
+  @media (orientation:portrait){
+    .news-teaser{
+      display:grid;
+      grid-template-columns:1fr;
+      grid-template-rows:70% 30%;
+      height:40vh;
+      min-height:40vh;
+    }
+    .news-teaser-image{
+      grid-row:1;
+      grid-column:1;
+      width:100%;
+      height:auto;
+      min-height:0;
+      flex:none;
+    }
+    .news-teaser-text{
+      position:static;
+      grid-row:2;
+      grid-column:1;
+      min-height:0;
+      height:auto;
+      padding:20px 30px;
+      background:rgba(255,255,255,.5);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:0;
+    }
     .news-teaser-text h2{
-      font-size:2.4rem;
+      position:absolute;
+      left:30px;
+      bottom:calc(30% + 18px);
+      z-index:3;
+      margin:0;
+      color:var(--white);
+      font-size:2rem;
+      text-shadow:0 2px 8px rgba(0,0,0,.45);
+      pointer-events:none;
     }
     .news-teaser-text p{
-      font-size:1.35rem;
+      margin:0;
+      max-width:none;
+      color:var(--ink-900);
+      font-size:1rem;
+      line-height:1.6;
+    }
+    .lupe-btn{
+      position:absolute;
+      right:16px;
+      bottom:calc(30% + 16px);
+      z-index:4;
+      width:54px;
+      height:54px;
+      flex:none;
+      border:none;
+      border-radius:50%;
+      background:rgba(255,255,255,.3);
+      box-shadow:var(--shadow-soft);
+    }
+    .lupe-btn:hover{
+      background:var(--yellow-400);
+      transform:scale(1.06);
     }
   }
 
-  @media (max-width:720px){
-    .news-teaser-text{
-      padding:16px 20px;
-    }
+  /* Hochformat auf schmalen Geräten (Smartphones): etwas kompaktere Maße */
+  @media (orientation:portrait) and (max-width:720px){
+    .news-teaser-text{padding:16px 20px;}
     .news-teaser-text h2{
       left:20px;
       bottom:calc(30% + 14px);
