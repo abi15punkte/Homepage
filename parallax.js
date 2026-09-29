@@ -7,19 +7,23 @@
    * ================================================================
    *
    * startScale / endScale
-   *   Zoomstärke. 1.0 = unverändert; 1.5 = 50 % größer.
+   *   1.0 = normale "cover"-Darstellung.
+   *   1.5 = Bild 50 % stärker vergrößert.
    *
    * targetX / targetY
-   *   Zielpunkt innerhalb des Bildausschnitts in Prozent.
+   *   Zielpunkt im Originalbild in Prozent.
    *   0/0 = oben links, 50/50 = Mitte, 100/100 = unten rechts.
    *
    * zoomInDuration / zoomOutDuration
    *   Dauer für Hinein- bzw. Herauszoomen in Millisekunden.
    *
    * cycleDelay
-   *   Optionaler Versatz innerhalb der 10-Sekunden-Schleife.
+   *   Optionaler zeitlicher Versatz der einzelnen Bilder.
    *
-   * Damit kann jedes Bild unabhängig eingestellt werden.
+   * Die Layout-Container selbst werden niemals transformiert.
+   * Die Animation erfolgt ausschließlich über background-size und
+   * background-position. Dadurch bleiben Teaser-Aufteilung, Scroll-
+   * position und sonstige Layout-Transformationen vollständig getrennt.
    */
   const DEFAULT_CONFIG = {
     startScale: 1.0,
@@ -100,13 +104,11 @@
     }
   };
 
-  // Für bequemes Nachjustieren aus der Browser-Konsole zugänglich.
   window.LANDING_PAGE_PARALLAX_CONFIG = PARALLAX_CONFIG;
 
   const clamp = (value, min, max) =>
     Math.min(max, Math.max(min, value));
 
-  // Gleiche Easing-Kurve wie im Parallax-Testprojekt.
   const ease = (t) =>
     t < 0.5
       ? 2 * t * t
@@ -122,8 +124,43 @@
 
   const targets = [];
 
-  function addTarget(id, element, type) {
-    if (!element || targets.some((target) => target.element === element)) {
+  function extractBackgroundUrl(backgroundImage) {
+    const trimmed = backgroundImage.trim();
+
+    if (trimmed === "none") {
+      return null;
+    }
+
+    const match = trimmed.match(/^url\((['"]?)(.*?)\1\)$/);
+    return match ? match[2] : null;
+  }
+
+  function loadImageSize(url) {
+    return new Promise((resolve) => {
+      const image = new Image();
+
+      image.addEventListener("load", () => {
+        if (image.naturalWidth > 0 && image.naturalHeight > 0) {
+          resolve({
+            width: image.naturalWidth,
+            height: image.naturalHeight
+          });
+          return;
+        }
+
+        resolve(null);
+      });
+
+      image.addEventListener("error", () => resolve(null));
+      image.src = url;
+    });
+  }
+
+  async function addTarget(id, element) {
+    if (
+      !element ||
+      targets.some((target) => target.element === element)
+    ) {
       return;
     }
 
@@ -132,50 +169,34 @@
       return;
     }
 
-    let media = element;
-    let frame = element;
+    const backgroundImage = getComputedStyle(element).backgroundImage;
+    const url = extractBackgroundUrl(backgroundImage);
 
-    if (type === "background") {
-      const backgroundImage =
-        element.style.backgroundImage ||
-        getComputedStyle(element).backgroundImage;
-
-      if (!backgroundImage || backgroundImage === "none") {
-        return;
-      }
-
-      const layer = document.createElement("div");
-      layer.className = "parallax-layer";
-
-      const computed = getComputedStyle(element);
-      layer.style.position = "absolute";
-      layer.style.inset = "0";
-      layer.style.backgroundImage = backgroundImage;
-      layer.style.backgroundSize = computed.backgroundSize;
-      layer.style.backgroundPosition = computed.backgroundPosition;
-      layer.style.backgroundRepeat = computed.backgroundRepeat;
-      layer.style.backgroundOrigin = computed.backgroundOrigin;
-      layer.style.backgroundColor = computed.backgroundColor;
-
-      element.style.backgroundImage = "none";
-      element.classList.add("parallax-background");
-      element.appendChild(layer);
-
-      media = layer;
-      frame = element;
-    } else {
-      element.classList.add("parallax-media");
-      frame = element.parentElement || element;
+    if (!url) {
+      return;
     }
 
-    media.dataset.parallaxId = id;
-    media.style.transformOrigin = "0 0";
+    const imageSize = await loadImageSize(url);
+
+    if (!imageSize) {
+      return;
+    }
+
+    /*
+     * background-size / background-position werden direkt auf dem
+     * bestehenden Element animiert. Keine zusätzliche Ebene, kein
+     * transform, kein neuer Layout-Container.
+     */
+    element.style.backgroundImage = backgroundImage;
+    element.style.backgroundRepeat = "no-repeat";
 
     targets.push({
       id,
-      element: media,
-      frame,
-      config
+      element,
+      config,
+      imageWidth: imageSize.width,
+      imageHeight: imageSize.height,
+      animationStart: performance.now()
     });
   }
 
@@ -183,7 +204,7 @@
     document
       .querySelectorAll("#hero .hero-slide")
       .forEach((element, index) => {
-        addTarget(`hero-${index + 1}`, element, "background");
+        void addTarget(`hero-${index + 1}`, element);
       });
 
     const teaserIds = {
@@ -203,28 +224,23 @@
             ? teaserIds[teaser.id]
             : `teaser-${index + 1}`;
 
-        addTarget(id, element, "background");
+        void addTarget(id, element);
       });
 
-    // Zukunftssicher: beliebige weitere Bilder können einfach
-    // mit data-parallax-id="mein-bild" ergänzt werden.
+    /*
+     * Zukunftssicher: beliebige weitere Elemente mit
+     * data-parallax-id können ebenfalls registriert werden.
+     */
     document
       .querySelectorAll("[data-parallax-id]")
       .forEach((element) => {
-        if (element.classList.contains("parallax-layer")) {
-          return;
-        }
-
         const id = element.dataset.parallaxId;
-        if (!id) {
+
+        if (!id || targets.some((target) => target.element === element)) {
           return;
         }
 
-        addTarget(
-          id,
-          element,
-          element.tagName === "IMG" ? "image" : "background"
-        );
+        void addTarget(id, element);
       });
   }
 
@@ -234,42 +250,35 @@
     const cycleDuration = durationIn + durationOut;
 
     const elapsed =
-      ((timestamp - target.animationStart) -
-        target.config.cycleDelay) %
+      (timestamp - target.animationStart - target.config.cycleDelay) %
       cycleDuration;
 
-    const cycleProgress =
+    const cyclePosition =
       elapsed < 0
-        ? (elapsed + cycleDuration) / cycleDuration
-        : elapsed / cycleDuration;
+        ? elapsed + cycleDuration
+        : elapsed;
 
-    if (cycleProgress <= durationIn / cycleDuration) {
-      return clamp(
-        (cycleProgress * cycleDuration) / durationIn,
-        0,
-        1
-      );
+    if (cyclePosition <= durationIn) {
+      return clamp(cyclePosition / durationIn, 0, 1);
     }
 
     return clamp(
-      1 -
-        ((cycleProgress * cycleDuration - durationIn) /
-          durationOut),
+      1 - ((cyclePosition - durationIn) / durationOut),
       0,
       1
     );
   }
 
   function updateTarget(target, timestamp) {
-    const width = target.frame.clientWidth;
-    const height = target.frame.clientHeight;
+    const rect = target.element.getBoundingClientRect();
 
-    if (width <= 0 || height <= 0) {
+    if (rect.width <= 0 || rect.height <= 0) {
       return;
     }
 
     const rawProgress = getAnimationProgress(target, timestamp);
     const progress = ease(rawProgress);
+
     const scale = lerp(
       target.config.startScale,
       target.config.endScale,
@@ -277,67 +286,98 @@
     );
 
     /*
-     * Die Parallax-Ebene wird ausschließlich relativ zu ihrem eigenen
-     * Bildcontainer berechnet. Dadurch ist die Animation unabhängig vom
-     * Scrollen der Seite und kann niemals weiße Flächen außerhalb des
-     * Bildbereichs erzeugen.
-     *
-     * Zielpunkt -> Mittelpunkt des jeweiligen Bildcontainers.
+     * Erst die normale "cover"-Skalierung berechnen.
+     * Danach wird ausschließlich diese bereits vollflächige
+     * Darstellung vergrößert. Dadurch bleibt das Bild auch während
+     * des Herauszoomens immer vollständig deckend.
      */
-    const targetX = width * (target.config.targetX / 100);
-    const targetY = height * (target.config.targetY / 100);
+    const coverScale = Math.max(
+      rect.width / target.imageWidth,
+      rect.height / target.imageHeight
+    );
 
-    const desiredTranslateX =
-      width / 2 - targetX * scale;
-    const desiredTranslateY =
-      height / 2 - targetY * scale;
+    const renderedWidth =
+      target.imageWidth * coverScale * scale;
+    const renderedHeight =
+      target.imageHeight * coverScale * scale;
+
+    const targetImageX =
+      target.imageWidth * (target.config.targetX / 100);
+    const targetImageY =
+      target.imageHeight * (target.config.targetY / 100);
+
+    const renderedTargetX =
+      targetImageX * coverScale * scale;
+    const renderedTargetY =
+      targetImageY * coverScale * scale;
 
     /*
-     * Die Transformationswerte werden so begrenzt, dass die skalierte
-     * Bildfläche den Container auf beiden Achsen immer vollständig
-     * abdeckt. Damit kann selbst ein weit außen liegender Zielpunkt
-     * niemals einen weißen Rand erzeugen.
+     * Positioniere den konfigurierten Zielpunkt in der Mitte des
+     * Bildcontainers. Anschließend begrenzen wir die Position so,
+     * dass auf keiner Achse ein ungefüllter Bereich entstehen kann.
      */
-    const minTranslateX = width - width * scale;
-    const maxTranslateX = 0;
-    const minTranslateY = height - height * scale;
-    const maxTranslateY = 0;
+    const desiredLeft =
+      rect.width / 2 - renderedTargetX;
+    const desiredTop =
+      rect.height / 2 - renderedTargetY;
 
-    const translateX = clamp(
-      desiredTranslateX,
-      minTranslateX,
-      maxTranslateX
-    );
-    const translateY = clamp(
-      desiredTranslateY,
-      minTranslateY,
-      maxTranslateY
-    );
+    const minLeft = rect.width - renderedWidth;
+    const maxLeft = 0;
 
-    target.element.style.transform =
-      `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+    const minTop = rect.height - renderedHeight;
+    const maxTop = 0;
+
+    const left = clamp(desiredLeft, minLeft, maxLeft);
+    const top = clamp(desiredTop, minTop, maxTop);
+
+    elementSetBackground(
+      target.element,
+      renderedWidth,
+      renderedHeight,
+      left,
+      top
+    );
+  }
+
+  function elementSetBackground(
+    element,
+    width,
+    height,
+    left,
+    top
+  ) {
+    element.style.backgroundSize =
+      `${width}px ${height}px`;
+    element.style.backgroundPosition =
+      `${left}px ${top}px`;
   }
 
   let animationFrame = 0;
-  let animationStart = performance.now();
 
   function update(timestamp) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       targets.forEach((target) => {
-        target.element.style.transform = "none";
+        const rect = target.element.getBoundingClientRect();
+
+        if (rect.width <= 0 || rect.height <= 0) {
+          return;
+        }
+
+        const coverScale = Math.max(
+          rect.width / target.imageWidth,
+          rect.height / target.imageHeight
+        );
+
+        target.element.style.backgroundSize =
+          `${target.imageWidth * coverScale}px ${target.imageHeight * coverScale}px`;
+        target.element.style.backgroundPosition = "50% 50%";
       });
 
       animationFrame = 0;
       return;
     }
 
-    targets.forEach((target) => {
-      if (!target.animationStart) {
-        target.animationStart = animationStart;
-      }
-      updateTarget(target, timestamp);
-    });
-
+    targets.forEach((target) => updateTarget(target, timestamp));
     animationFrame = window.requestAnimationFrame(update);
   }
 
@@ -348,14 +388,7 @@
   }
 
   function init() {
-    animationStart = performance.now();
-
     collectTargets();
-
-    targets.forEach((target) => {
-      target.animationStart = animationStart;
-    });
-
     requestUpdate();
 
     window.addEventListener("resize", requestUpdate);
