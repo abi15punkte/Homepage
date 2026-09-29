@@ -408,14 +408,14 @@
     /* .lupe-btn: Basisdefinition (Streifen rechts, order:3) bleibt unverändert */
   }
 
-  /* ---------- HOCHFORMAT: Bild oben (70 %), Text unten (30 %), Titel und Lupe auf dem Bild ---------- */
+  /* ---------- HOCHFORMAT: dynamisches Layout nach tatsächlichem Seitenverhältnis ---------- */
   @media (orientation:portrait){
     .news-teaser{
       display:grid;
       grid-template-columns:1fr;
-      grid-template-rows:70% 30%;
-      height:40vh;
-      min-height:40vh;
+      grid-template-rows:var(--teaser-image-share) var(--teaser-text-share);
+      height:var(--teaser-height);
+      min-height:var(--teaser-height);
     }
     .news-teaser-image{
       grid-row:1;
@@ -432,7 +432,7 @@
       min-height:0;
       height:auto;
       padding:20px 30px;
-      background:transparent; /* weißer Hintergrund (30 % transparent) kommt von .news-teaser */
+      background:transparent;
       display:flex;
       flex-direction:column;
       justify-content:center;
@@ -441,7 +441,7 @@
     .news-teaser-text h2{
       position:absolute;
       left:30px;
-      bottom:calc(30% + 18px);
+      bottom:calc(var(--teaser-text-share) + 18px);
       z-index:3;
       margin:0;
       color:var(--white);
@@ -459,7 +459,7 @@
     .lupe-btn{
       position:absolute;
       right:16px;
-      bottom:calc(30% + 16px);
+      bottom:calc(var(--teaser-text-share) + 16px);
       z-index:4;
       width:54px;
       height:54px;
@@ -475,18 +475,28 @@
     }
   }
 
-  /* Hochformat auf schmalen Geräten (Smartphones): etwas kompaktere Maße */
+  /* Hochformat auf schmalen Geräten: kompaktere Innenabstände, die
+     Geometrie bleibt vollständig an das Seitenverhältnis gekoppelt. */
   @media (orientation:portrait) and (max-width:720px){
     .news-teaser-text{padding:16px 20px;}
     .news-teaser-text h2{
       left:20px;
-      bottom:calc(30% + 14px);
+      bottom:calc(var(--teaser-text-share) + 14px);
       font-size:1.55rem;
     }
     .lupe-btn{
       right:16px;
-      bottom:calc(30% + 12px);
+      bottom:calc(var(--teaser-text-share) + 12px);
     }
+  }
+
+  /* Die Werte werden per JS anhand des tatsächlichen CSS-Viewport-
+     Seitenverhältnisses zwischen zwei definierten Endpunkten
+     interpoliert. */
+  :root{
+    --teaser-height:40vh;
+    --teaser-image-share:70%;
+    --teaser-text-share:30%;
   }
 
 </style>
@@ -1173,5 +1183,69 @@
 </script>
 
   <script src="parallax.js"></script>
+<script>
+(() => {
+  const MIN_RATIO = 1280 / 2772; // Xiaomi 15T: 0.4618...
+  const MAX_RATIO = 3 / 4;       // iPad 4:3 im Hochformat
+
+  const MIN_HEIGHT_VH = 40;
+  const MAX_HEIGHT_VH = 46;
+  const MIN_IMAGE_SHARE = 70;
+  const MAX_IMAGE_SHARE = 80;
+
+  let rafId = 0;
+
+  function updatePortraitTeaserLayout() {
+    rafId = 0;
+
+    const viewport = window.visualViewport;
+    const width = viewport ? viewport.width : window.innerWidth;
+    const height = viewport ? viewport.height : window.innerHeight;
+
+    if (!height) return;
+
+    const ratio = width / height;
+    const factor = Math.max(
+      0,
+      Math.min(1, (ratio - MIN_RATIO) / (MAX_RATIO - MIN_RATIO))
+    );
+
+    const teaserHeight = MIN_HEIGHT_VH +
+      (MAX_HEIGHT_VH - MIN_HEIGHT_VH) * factor;
+
+    const imageShare = MIN_IMAGE_SHARE +
+      (MAX_IMAGE_SHARE - MIN_IMAGE_SHARE) * factor;
+
+    const textShare = 100 - imageShare;
+
+    document.documentElement.style.setProperty(
+      '--teaser-height',
+      teaserHeight.toFixed(3) + 'vh'
+    );
+    document.documentElement.style.setProperty(
+      '--teaser-image-share',
+      imageShare.toFixed(3) + '%'
+    );
+    document.documentElement.style.setProperty(
+      '--teaser-text-share',
+      textShare.toFixed(3) + '%'
+    );
+  }
+
+  function scheduleUpdate() {
+    if (rafId) return;
+    rafId = requestAnimationFrame(updatePortraitTeaserLayout);
+  }
+
+  window.addEventListener('resize', scheduleUpdate, { passive: true });
+  window.addEventListener('orientationchange', scheduleUpdate, { passive: true });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', scheduleUpdate, { passive: true });
+  }
+
+  updatePortraitTeaserLayout();
+})();
+</script>
 </body>
 </html>
