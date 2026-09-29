@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - responsive-portrait-teasers
+      - main
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   patch:
@@ -194,13 +196,23 @@ jobs:
               raise RuntimeError("Expected exactly one </body> marker.")
 
           html = html.replace(body_marker, script + "\n" + body_marker, 1)
-
           path.write_text(html, encoding="utf-8")
-      - name: Commit patched index and remove temporary workflow
+
+      - name: Commit patch, remove temporary files, and redeploy Pages
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html .github/workflows/apply-responsive-portrait-teasers.yml
+
+          git rm -f .github/workflows/apply-responsive-portrait-teasers.yml .portrait-teaser-trigger || true
+          git add index.html
           git commit -m "Responsive portrait teaser layout"
           git push
+
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${{ github.repository }}/actions/workflows/pages.yml/dispatches" \
+            -f ref=main
