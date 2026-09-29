@@ -261,8 +261,10 @@
   }
 
   function updateTarget(target, timestamp) {
-    const rect = target.frame.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) {
+    const width = target.frame.clientWidth;
+    const height = target.frame.clientHeight;
+
+    if (width <= 0 || height <= 0) {
       return;
     }
 
@@ -274,29 +276,43 @@
       progress
     );
 
-    const targetX = rect.width * (target.config.targetX / 100);
-    const targetY = rect.height * (target.config.targetY / 100);
+    /*
+     * Die Parallax-Ebene wird ausschließlich relativ zu ihrem eigenen
+     * Bildcontainer berechnet. Dadurch ist die Animation unabhängig vom
+     * Scrollen der Seite und kann niemals weiße Flächen außerhalb des
+     * Bildbereichs erzeugen.
+     *
+     * Zielpunkt -> Mittelpunkt des jeweiligen Bildcontainers.
+     */
+    const targetX = width * (target.config.targetX / 100);
+    const targetY = height * (target.config.targetY / 100);
 
-    const screenX = rect.left + targetX;
-    const screenY = rect.top + targetY;
+    const desiredTranslateX =
+      width / 2 - targetX * scale;
+    const desiredTranslateY =
+      height / 2 - targetY * scale;
 
-    // Genau wie im Testprojekt: Beim Hineinzoomen wandert der
-    // konfigurierte Zielpunkt zur Bildschirmmitte.
-    const desiredX = lerp(
-      screenX,
-      window.innerWidth / 2,
-      progress
+    /*
+     * Die Transformationswerte werden so begrenzt, dass die skalierte
+     * Bildfläche den Container auf beiden Achsen immer vollständig
+     * abdeckt. Damit kann selbst ein weit außen liegender Zielpunkt
+     * niemals einen weißen Rand erzeugen.
+     */
+    const minTranslateX = width - width * scale;
+    const maxTranslateX = 0;
+    const minTranslateY = height - height * scale;
+    const maxTranslateY = 0;
+
+    const translateX = clamp(
+      desiredTranslateX,
+      minTranslateX,
+      maxTranslateX
     );
-    const desiredY = lerp(
-      screenY,
-      window.innerHeight / 2,
-      progress
+    const translateY = clamp(
+      desiredTranslateY,
+      minTranslateY,
+      maxTranslateY
     );
-
-    const translateX =
-      desiredX - rect.left - targetX * scale;
-    const translateY =
-      desiredY - rect.top - targetY * scale;
 
     target.element.style.transform =
       `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
