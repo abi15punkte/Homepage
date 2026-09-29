@@ -10,24 +10,25 @@
    *   Zoomstärke. 1.0 = unverändert; 1.5 = 50 % größer.
    *
    * targetX / targetY
-   *   Zielpunkt innerhalb des jeweiligen Bildausschnitts in Prozent.
+   *   Zielpunkt innerhalb des Bildausschnitts in Prozent.
    *   0/0 = oben links, 50/50 = Mitte, 100/100 = unten rechts.
    *
-   * progressMode
-   *   "section": der Effekt läuft über die komplette Sektion
-   *              (für den Hero sinnvoll).
-   *   "viewport": der Effekt läuft vom Eintritt unten bis zum
-   *               Austritt oben (für kleinere Teaser sinnvoll).
+   * zoomInDuration / zoomOutDuration
+   *   Dauer für Hinein- bzw. Herauszoomen in Millisekunden.
    *
-   * Für ein neues Bild genügt ein weiterer Eintrag. Bilder ohne
-   * eigenen Eintrag verwenden DEFAULT_CONFIG.
+   * cycleDelay
+   *   Optionaler Versatz innerhalb der 10-Sekunden-Schleife.
+   *
+   * Damit kann jedes Bild unabhängig eingestellt werden.
    */
   const DEFAULT_CONFIG = {
     startScale: 1.0,
     endScale: 1.55,
     targetX: 50,
     targetY: 50,
-    progressMode: "viewport",
+    zoomInDuration: 5000,
+    zoomOutDuration: 5000,
+    cycleDelay: 0,
     enabled: true
   };
 
@@ -37,21 +38,24 @@
       endScale: 1.65,
       targetX: 50,
       targetY: 50,
-      progressMode: "section"
+      zoomInDuration: 5000,
+      zoomOutDuration: 5000
     },
     "hero-2": {
       startScale: 1.0,
       endScale: 1.65,
       targetX: 50,
       targetY: 50,
-      progressMode: "section"
+      zoomInDuration: 5000,
+      zoomOutDuration: 5000
     },
     "hero-3": {
       startScale: 1.0,
       endScale: 1.65,
       targetX: 50,
       targetY: 50,
-      progressMode: "section"
+      zoomInDuration: 5000,
+      zoomOutDuration: 5000
     },
 
     "teaser-news": {
@@ -59,35 +63,40 @@
       endScale: 1.50,
       targetX: 50,
       targetY: 50,
-      progressMode: "viewport"
+      zoomInDuration: 5000,
+      zoomOutDuration: 5000
     },
     "teaser-school": {
       startScale: 1.0,
       endScale: 1.50,
       targetX: 50,
       targetY: 50,
-      progressMode: "viewport"
+      zoomInDuration: 5000,
+      zoomOutDuration: 5000
     },
     "teaser-dates": {
       startScale: 1.0,
       endScale: 1.50,
       targetX: 50,
       targetY: 50,
-      progressMode: "viewport"
+      zoomInDuration: 5000,
+      zoomOutDuration: 5000
     },
     "teaser-contact": {
       startScale: 1.0,
       endScale: 1.50,
       targetX: 50,
       targetY: 50,
-      progressMode: "viewport"
+      zoomInDuration: 5000,
+      zoomOutDuration: 5000
     },
     "teaser-support": {
       startScale: 1.0,
       endScale: 1.50,
       targetX: 50,
       targetY: 50,
-      progressMode: "viewport"
+      zoomInDuration: 5000,
+      zoomOutDuration: 5000
     }
   };
 
@@ -219,33 +228,45 @@
       });
   }
 
-  function progressFor(target, rect) {
-    if (target.config.progressMode === "section") {
-      const sectionTop = window.scrollY + rect.top;
-      const range = Math.max(1, rect.height);
+  function getAnimationProgress(target, timestamp) {
+    const durationIn = Math.max(1, target.config.zoomInDuration);
+    const durationOut = Math.max(1, target.config.zoomOutDuration);
+    const cycleDuration = durationIn + durationOut;
+
+    const elapsed =
+      ((timestamp - target.animationStart) -
+        target.config.cycleDelay) %
+      cycleDuration;
+
+    const cycleProgress =
+      elapsed < 0
+        ? (elapsed + cycleDuration) / cycleDuration
+        : elapsed / cycleDuration;
+
+    if (cycleProgress <= durationIn / cycleDuration) {
       return clamp(
-        (window.scrollY - sectionTop) / range,
+        (cycleProgress * cycleDuration) / durationIn,
         0,
         1
       );
     }
 
-    // Vom Eintritt unten bis zum Austritt oben.
-    const denominator = window.innerHeight + rect.height;
     return clamp(
-      (window.innerHeight - rect.top) / Math.max(1, denominator),
+      1 -
+        ((cycleProgress * cycleDuration - durationIn) /
+          durationOut),
       0,
       1
     );
   }
 
-  function updateTarget(target) {
+  function updateTarget(target, timestamp) {
     const rect = target.frame.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) {
       return;
     }
 
-    const rawProgress = progressFor(target, rect);
+    const rawProgress = getAnimationProgress(target, timestamp);
     const progress = ease(rawProgress);
     const scale = lerp(
       target.config.startScale,
@@ -259,6 +280,8 @@
     const screenX = rect.left + targetX;
     const screenY = rect.top + targetY;
 
+    // Genau wie im Testprojekt: Beim Hineinzoomen wandert der
+    // konfigurierte Zielpunkt zur Bildschirmmitte.
     const desiredX = lerp(
       screenX,
       window.innerWidth / 2,
@@ -279,37 +302,46 @@
       `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
   }
 
-  let frameRequested = false;
+  let animationFrame = 0;
+  let animationStart = performance.now();
 
-  function update() {
-    frameRequested = false;
-
+  function update(timestamp) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       targets.forEach((target) => {
         target.element.style.transform = "none";
       });
+
+      animationFrame = 0;
       return;
     }
 
-    targets.forEach(updateTarget);
+    targets.forEach((target) => {
+      if (!target.animationStart) {
+        target.animationStart = animationStart;
+      }
+      updateTarget(target, timestamp);
+    });
+
+    animationFrame = window.requestAnimationFrame(update);
   }
 
   function requestUpdate() {
-    if (frameRequested) {
-      return;
+    if (!animationFrame) {
+      animationFrame = window.requestAnimationFrame(update);
     }
-
-    frameRequested = true;
-    window.requestAnimationFrame(update);
   }
 
   function init() {
-    collectTargets();
-    update();
+    animationStart = performance.now();
 
-    window.addEventListener("scroll", requestUpdate, {
-      passive: true
+    collectTargets();
+
+    targets.forEach((target) => {
+      target.animationStart = animationStart;
     });
+
+    requestUpdate();
+
     window.addEventListener("resize", requestUpdate);
   }
 
