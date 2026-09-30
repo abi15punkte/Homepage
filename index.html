@@ -491,18 +491,18 @@
     }
   }
 
-  /* ---------- QUERFORMAT-TEST: Teaser 40vw breit, 80vh hoch, zwei nebeneinander ---------- */
+  /* ---------- QUERFORMAT-TEST: Teaser 45vw breit, 80vh hoch, zwei nebeneinander ---------- */
   @media (orientation:landscape){
     .teaser-grid{
       display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start;
-      gap:5vh 4vw;
-      padding:2.5vh clamp(20px, 4vw, 64px);
+      gap:5vh 2vw;
+      padding:2.5vh 2vw;
     }
     .news-teaser-wrap{padding:0; flex:0 0 auto;}
     .news-teaser{
-      width:40vw; max-width:none; margin:0;
+      width:45vw; max-width:none; margin:0;
       height:80vh; min-height:80vh;
-      --teaser-image-share:70%; --teaser-text-share:30%; /* fester Bild/Text-Anteil, JS-Interpolation gilt nur fürs Hochformat */
+      --teaser-image-share:80%; --teaser-text-share:20%; /* fester Bild/Text-Anteil, JS-Interpolation gilt nur fürs Hochformat */
       cursor:default; touch-action:auto;
     }
     /* Kein Wisch-Hinweis und kein Wegwischen im Querformat */
