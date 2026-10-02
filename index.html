@@ -333,15 +333,31 @@
   .date-body h3{font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.12rem; margin:0; color:var(--blue-700);}
   .date-body p{margin:5px 0 0; font-size:.92rem; line-height:1.55; color:var(--ink-900);}
 
+  /* Querformat: Termine zweispaltig (Termin 1 | Termin 2, Termin 3 | Termin 4, ...).
+     Die Monatsüberschriften laufen über beide Spalten. */
+  @media (orientation:landscape){
+    .dates-content{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      column-gap:clamp(28px, 4vw, 64px);
+      align-items:start;
+      max-width:1400px;
+    }
+    .dates-content .month-divider{grid-column:1 / -1;}
+    .dates-content .date-item:last-child{padding-bottom:20px;}
+  }
+
   /* =====================================================================
      SEITENHINTERGRUND: je Ausrichtung ein eigenes Bild
      Hochformat -> Hintergrund.png       (hochkant, vorhanden)
-     Querformat -> Hintergrund-quer.png  (noch zu erstellen; bis dahin gilt die Ersatzfarbe)
+     Querformat -> Hintergrund2.png
      ===================================================================== */
   /* Aufhellung: weiße Schicht über dem Bild. 0 = Bild unverändert, 1 = komplett weiß.
-     Aktuell 90 % (Termine-Unterseite 95 %) -> hier einfach den Wert anpassen. */
+     Aktuell 90 % (Termine-Unterseite: Hochformat 95 %, Querformat 93 %) -> hier einfach den Wert anpassen. */
   :root{ --bg-fade:0.90; }
-  #datesOverlay{ --bg-fade:0.95; } /* Termine-Unterseite: 95 % */
+  /* Termine-Unterseite: Aufhellung je Ausrichtung */
+  @media (orientation:portrait){  #datesOverlay{ --bg-fade:0.95; } } /* Hochformat: 95 % */
+  @media (orientation:landscape){ #datesOverlay{ --bg-fade:0.93; } } /* Querformat: 93 % (Test) */
 
   @media (orientation:portrait){
     body, .news-overlay{
@@ -356,10 +372,11 @@
   }
   @media (orientation:landscape){
     body, .news-overlay{
-      background-color:var(--blue-50); /* Ersatzfarbe, solange Hintergrund-quer.png fehlt */
+      background-color:#ece7d3; /* Papierton des Bildes, falls es noch lädt */
+      /* Querformat: eigenes Bild Hintergrund2.png */
       background-image:
         linear-gradient(rgba(255,255,255,var(--bg-fade)), rgba(255,255,255,var(--bg-fade))),
-        url('Hintergrund-quer.png');
+        url('Hintergrund2.png');
       background-size:100% 100%, 100% auto;
       background-repeat:no-repeat, repeat-y;
       background-position:center top, center top;
