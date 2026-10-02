@@ -276,6 +276,14 @@
   .news-item-body h3{font-family:'Fredoka',sans-serif; font-size:1.05rem; margin:0; color:var(--blue-700);}
   .news-item-body p{margin:0; font-size:.92rem; line-height:1.5;}
 
+  /* ---------- Impressum & Datenschutz: einspaltiger Lesetext ---------- */
+  #imprintOverlay .overlay-content{grid-template-columns:1fr; max-width:900px;}
+  #imprintOverlay .month-divider{margin-top:12px;}
+  #imprintOverlay .month-divider:first-child{margin-top:0;}
+  #imprintOverlay .news-item-body{gap:10px;}
+  #imprintOverlay .news-item-body ul{margin:0; padding-left:1.3em; font-size:.92rem; line-height:1.55;}
+  #imprintOverlay .news-item-body a{color:var(--blue-600); font-weight:700; overflow-wrap:anywhere;}
+
   /* ---------- Beitragsdetail ---------- */
   #newsOverlay .news-item, #schoolOverlay .news-item{cursor:pointer; transition:transform .2s ease, box-shadow .2s ease;}
   #newsOverlay .news-item:hover, #schoolOverlay .news-item:hover{transform:translateY(-4px); box-shadow:0 12px 24px rgba(30,79,191,.16);}
@@ -977,28 +985,105 @@
       <h1>Impressum</h1>
     </div>
     <div class="overlay-content">
+      <div class="month-divider"><span>Impressum</span></div>
       <article class="news-item">
         <div class="news-item-body">
-          <h3>Angaben gemäß § 5 DDG</h3>
-          <p>Sonnenblick-Grundschule<br>Musterstraße 12<br>12345 Musterstadt</p>
-        </div>
-      </article>
-      <article class="news-item">
-        <div class="news-item-body">
-          <h3>Vertreten durch</h3>
-          <p>Schulleitung: Max Mustermann</p>
+          <h3>Angaben gemäß § 5 DDG – Verantwortlich für den Inhalt</h3>
+          <p>Astrid Niermann, Rektorin<br>GGS Astrid-Lindgren-Schule mit Montessori-Zweig<br>Aakerfährstraße 80<br>47058 Duisburg</p>
         </div>
       </article>
       <article class="news-item">
         <div class="news-item-body">
           <h3>Kontakt</h3>
-          <p>Telefon: 01234 567890<br>E-Mail: info@beispiel-schule.de</p>
+          <p>Telefon: <a href="tel:0203332667">0203/332667</a><br>E-Mail: <a href="mailto:GGS.AstridLindgrenSchule@stadt-duisburg.de">GGS.AstridLindgrenSchule@stadt-duisburg.de</a></p>
+        </div>
+      </article>
+      <article class="news-item">
+        <div class="news-item-body">
+          <h3>Verantwortlich für Texte und Fotos</h3>
+          <p>Astrid Niermann, Rektorin Astrid-Lindgren-Schule, 47058 Duisburg</p>
         </div>
       </article>
       <article class="news-item">
         <div class="news-item-body">
           <h3>Haftung für Inhalte</h3>
-          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.</p>
+          <p>Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte (insbesondere Termine) können wir trotzdem keine Gewähr übernehmen.</p>
+          <p>Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.</p>
+        </div>
+      </article>
+      <article class="news-item">
+        <div class="news-item-body">
+          <h3>Haftung für Links</h3>
+          <p>Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.</p>
+        </div>
+      </article>
+      <article class="news-item">
+        <div class="news-item-body">
+          <h3>Urheberrecht</h3>
+          <p>Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen.</p>
+          <p>Quelle des Haftungsausschlusses: eRecht24.de – Internetrecht von Rechtsanwalt Sören Siebert.</p>
+        </div>
+      </article>
+      <div class="month-divider"><span>Datenschutz</span></div>
+      <article class="news-item">
+        <div class="news-item-body">
+          <h3>Verantwortlicher</h3>
+          <p>Verantwortlicher gem. Art. 4 Nr. 7 EU-Datenschutz-Grundverordnung (EU-DSGVO) ist:</p>
+          <p>GGS Astrid-Lindgren-Schule<br>Astrid Niermann (Schulleiterin)<br>Aakerfährstraße 80<br>47058 Duisburg<br><a href="mailto:GGS.AstridLindgrenSchule@stadt-duisburg.de">GGS.AstridLindgrenSchule@stadt-duisburg.de</a></p>
+        </div>
+      </article>
+      <article class="news-item">
+        <div class="news-item-body">
+          <h3>Datenschutzbeauftragter</h3>
+          <p>Den schulischen Datenschutzbeauftragten erreichen Sie unter <a href="mailto:k.tenner@stadt-duisburg.de">k.tenner@stadt-duisburg.de</a> oder über die folgende Postadresse:</p>
+          <p>Herrn Tenner<br>Europaschule Krupp-Gymnasium<br>Flutweg 62<br>47228 Duisburg</p>
+        </div>
+      </article>
+      <article class="news-item">
+        <div class="news-item-body">
+          <h3>Datenverarbeitung beim Aufruf der Website</h3>
+          <p>Bei dem Aufruf unserer Website werden personenbezogene Daten erhoben. Dies ist aus technischen Gründen erforderlich, um Ihnen unsere Website anzuzeigen und die Stabilität und Sicherheit zu gewährleisten. Rechtsgrundlage ist Art. 6 Abs. 1 S. 1 lit. e, Abs. 3 EU-DSGVO in Verbindung mit § 3 Abs. 1 Datenschutzgesetz Nordrhein-Westfalen (DSG NRW).</p>
+          <p>Das Internetangebot der Schule wird bei Strato gehostet. Bei jedem Zugriff auf Inhalte des Internetangebotes werden dort personenbezogene Daten empfangen und vorübergehend bis zu sechs Monate über sogenannte Protokoll- oder Log-Dateien gespeichert. Die folgenden Daten werden bei jedem Aufruf der Internetseite erhoben:</p>
+          <ul>
+            <li>IP-Adresse</li>
+            <li>Datum und Uhrzeit des Abrufs</li>
+            <li>Inhalt der Anforderung (konkrete Seite)</li>
+            <li>Zugriffsstatus/HTTP-Statuscode</li>
+            <li>jeweils übertragene Datenmenge</li>
+            <li>Website, von der die Anforderung kommt</li>
+            <li>Browser</li>
+            <li>Betriebssystem und dessen Oberfläche</li>
+            <li>Sprache und Version der Browsersoftware</li>
+          </ul>
+          <p>Wir weisen darauf hin, dass Betreiber von fremden Internetseiten, die von dieser Seite aus verlinkt werden, die Daten von Besucherinnen und Besuchern dieser Internetseiten erheben und auswerten können.</p>
+        </div>
+      </article>
+      <article class="news-item">
+        <div class="news-item-body">
+          <h3>Kontaktaufnahme per E-Mail oder Telefon</h3>
+          <p>Bei Ihrer Kontaktaufnahme mit uns per E-Mail oder Telefon müssen die von Ihnen freiwillig mitgeteilten Daten (Ihre E-Mail-Adresse, ggf. Ihr Name und Ihre Telefonnummer) verarbeitet werden, um Ihrem Anliegen nachkommen zu können. Rechtsgrundlage ist Art. 6 Abs. 1 S. 1 lit. e, Abs. 3 EU-DSGVO in Verbindung mit § 3 Abs. 1 DSG NRW.</p>
+          <p>Die von Ihnen mitgeteilten persönlichen Daten verwenden wir nur zu dem von Ihnen gewünschten Zweck. Die in diesem Zusammenhang anfallenden Daten löschen wir, sobald die Speicherung nicht mehr erforderlich ist.</p>
+        </div>
+      </article>
+      <article class="news-item">
+        <div class="news-item-body">
+          <h3>Cookies, Analyse und Schriftarten</h3>
+          <p>Diese Website verwendet keine Cookies und setzt keine Analyse- oder Tracking-Dienste ein. Die verwendeten Schriftarten werden von unserem eigenen Server geladen; dabei findet keine Verbindung zu Servern Dritter statt.</p>
+        </div>
+      </article>
+      <article class="news-item">
+        <div class="news-item-body">
+          <h3>Ihre Rechte als Nutzer</h3>
+          <p>Sie haben nach Maßgabe der Artikel 15, 16, 17, 18, 20 und 21 EU-DSGVO gegenüber uns folgende Rechte hinsichtlich der Sie betreffenden personenbezogenen Daten:</p>
+          <ul>
+            <li>Recht auf Auskunft</li>
+            <li>Recht auf Berichtigung oder Löschung</li>
+            <li>Recht auf Einschränkung der Verarbeitung</li>
+            <li>Recht auf Widerspruch gegen die Verarbeitung</li>
+            <li>Recht auf Datenübertragbarkeit</li>
+          </ul>
+          <p>Wenn Sie der Auffassung sind, dass eine Verarbeitung Ihrer personenbezogenen Daten gegen Datenschutzrecht verstößt, haben Sie das Recht, sich bei der zuständigen Aufsichtsbehörde zu beschweren:</p>
+          <p>Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen<br>Postfach 20 04 44<br>40102 Düsseldorf<br>Tel.: 0211/38424-0<br>Fax: 0211/38424-10<br>E-Mail: <a href="mailto:poststelle@ldi.nrw.de">poststelle@ldi.nrw.de</a></p>
         </div>
       </article>
     </div>
